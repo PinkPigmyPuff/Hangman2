@@ -3,44 +3,56 @@ import string
 
 from words import words
 
+word = random.choice(words).upper()
+alphabet = string.ascii_uppercase
+print(word)
+guessed_letters = []
+lives = 6
 
-def hangman():
-    word = random.choice(words).upper()
-    print(word)
-    word_letters = set(word)
-    print(word_letters)
-    alphabet = set(string.ascii_uppercase)
-    used_letters = set()
 
-    lives = 6
-
-    while len(word_letters) > 0 and lives > 0:
-        # letters guessed
-        print('You have ', lives, ' lives left')
-        print('You have guessed these letters: ', ''.join(used_letters))
-        guess = input("Guess a letter: ").upper()
-
-        # current word
-        word_list = [letter if letter in used_letters else '_' for letter in word]
-        print('Current word: ', ''.join(word_list))
-
-        if guess in alphabet - used_letters:
-            used_letters.add(guess)
-            if guess in word_letters:
-                word_letters.remove(guess)
-            else:
-                lives -= 1
-
-        elif guess in used_letters:
-            print("You have already guessed this letter")
-
+def shown_word(word):
+    """
+    This function takes the hidden word and replaces the letters with underscores.
+    """
+    shown_word = []
+    for letter in word:
+        if letter in guessed_letters:
+            shown_word.append(letter)
         else:
-            print("invalid character")
+            shown_word.append("_")
+    return shown_word
 
-    if lives == 0:
-        print("You died")
+
+def guess_letter():
+    """
+    This function takes user input and checks if it is in the word.
+    """
+    print(shown_word(word))
+    guess = input("Guess a letter: ").upper()
+    guessed_letters.append(guess)
+    
+    if guess not in alphabet:
+        print("Invalid input \n, try again")
+        guess_letter()
+
+    if guess in word:
+        print("Correct! \n")
     else:
-        print("You win!")
+        print("Incorrect! \n")
+        global lives
+        lives -= 1
 
 
-hangman()
+while shown_word(word) != list(word) and lives > 0:
+    print(f"You have {lives} lives left.")
+    guess_letter()
+
+    if shown_word(word) == list(word):
+        print(word)
+        print("You won!")
+        break
+
+    elif lives == 0:
+        print(shown_word(word))
+        print("You lost!")
+        break
